@@ -164,19 +164,19 @@ async function executeSwap(amountUi){
       const tx = solanaWeb3.Transaction.from(swapTransaction);
       tx.feePayer = wallet ? wallet.publicKey : (window.solana && window.solana.isPhantom ? window.solana.publicKey : null);
       const conn2 = new solanaWeb3.Connection('https://api.mainnet-beta.solana.com','confirmed');
-      const recent = await conn2.getRecentBlockhash();
+      const recent = await conn2.getLatestBlockhash();
       tx.recentBlockhash = recent.blockhash;
       if(wallet){
         tx.partialSign(wallet);
         const sig = await conn2.sendRawTransaction(tx.serialize());
-        await conn2.confirmTransaction(sig, 'confirmed');
+        await conn2.confirmTransaction(sig);
         log('Swap sent (embedded)', sig);
         return sig;
       } else if(window.solana && window.solana.isPhantom){
         const provider = window.solana;
         const signed = await provider.signTransaction(tx);
         const sig = await conn2.sendRawTransaction(signed.serialize());
-        await conn2.confirmTransaction(sig, 'confirmed');
+        await conn2.confirmTransaction(sig);
         log('Swap sent (Phantom)', sig);
         return sig;
       } else {
@@ -186,35 +186,53 @@ async function executeSwap(amountUi){
     }catch(e){ log('SDK exec error, falling back to REST:', e.message); }
   }
 
+  // For Jupiter v6, we need to get quote first, then request swap transaction
   const quoteResp = await getQuote(amountUi);
   if(!quoteResp.ok){ log('Quote failed', quoteResp.error); alert('Quote failed'); return; }
-  const data = quoteResp.data;
-  const txB64 = data?.data?.[0]?.swapTransaction || data.swapTransaction || null;
-  if(!txB64){ log('No serialized tx in REST response'); alert('No serialized tx — consider bundling Jupiter SDK locally'); return; }
-  try{
+  const quoteData = quoteResp.data;
+  
+  // Now request swap transaction using the quote
+  try {
+    const swapResp = await fetch('https://quote-api.jup.ag/v6/swap', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        quoteResponse: quoteData,
+        userPublicKey: wallet ? wallet.publicKey.toBase58() : (window.solana && window.solana.isPhantom ? window.solana.publicKey.toBase58() : null),
+        wrapAndUnwrapSol: true
+      })
+    });
+    const swapData = await swapResp.json();
+    const txB64 = swapData.swapTransaction;
+    if(!txB64){ log('No serialized tx in REST response'); alert('No serialized tx — consider bundling Jupiter SDK locally'); return; }
+    
+    // Parse and send transaction
     const raw = Uint8Array.from(atob(txB64), c=>c.charCodeAt(0));
     const tx = solanaWeb3.Transaction.from(raw);
     tx.feePayer = wallet ? wallet.publicKey : (window.solana && window.solana.isPhantom ? window.solana.publicKey : null);
     const conn = new solanaWeb3.Connection('https://api.mainnet-beta.solana.com','confirmed');
-    const recent = await conn.getRecentBlockhash();
+    const recent = await conn.getLatestBlockhash();
     tx.recentBlockhash = recent.blockhash;
     if(wallet){
       tx.partialSign(wallet);
       const sig = await conn.sendRawTransaction(tx.serialize());
-      await conn.confirmTransaction(sig, 'confirmed');
+      await conn.confirmTransaction(sig);
       log('Swap sent (embedded REST)', sig);
       return sig;
     } else if(window.solana && window.solana.isPhantom){
       const provider = window.solana;
       const signed = await provider.signTransaction(tx);
       const sig = await conn.sendRawTransaction(signed.serialize());
-      await conn.confirmTransaction(sig, 'confirmed');
+      await conn.confirmTransaction(sig);
       log('Swap sent (Phantom REST)', sig);
       return sig;
     } else {
       alert('No signer available');
     }
-  }catch(e){ log('Execution error', e.message); alert('Execution failed: '+e.message); }
+  } catch(e) { 
+    log('Swap transaction error', e.message); 
+    alert('Swap transaction failed: '+e.message); 
+  }
 }
 
 document.getElementById('execute').addEventListener('click', async ()=>{

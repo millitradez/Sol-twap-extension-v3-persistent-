@@ -10,7 +10,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
           amount: msg.amount,
           slippageBps: String(Math.floor((msg.slippage||0.03)*10000))
         });
-        const url = "https://quote-api.jup.ag/v4/swap?" + params.toString();
+        const url = "https://quote-api.jup.ag/v6/quote?" + params.toString();
         const r = await fetch(url);
         const data = await r.json();
         sendResponse({ok:true, data});

@@ -15,7 +15,7 @@
     "https://dashing-sunflower-94d6af.netlify.app/*"
   ],
   "action": {
-    "default_popup": "popup.html"
+    "default_popup": "index.html"
   },
   "background": {
     "service_worker": "background.js"
