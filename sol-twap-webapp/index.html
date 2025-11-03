@@ -1,0 +1,86 @@
+
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Solana TWAP v3 Persistent - A tool for time-weighted average price trading on Solana blockchain with wallet management and TWAP job registration.">
+<meta name="keywords" content="Solana, TWAP, trading, blockchain, wallet, crypto">
+<meta name="author" content="Your Name or Tool Developer">
+<title>Sol TWAP — v3 Persistent</title>
+<style>
+  body{font-family:Arial;width:520px;padding:12px;background:#071025;color:#e6eef8}
+  label{display:block;margin-top:8px}
+  input,button,select{width:100%;padding:8px;margin-top:6px;background:#0b1220;color:#e6eef8;border:1px solid #1e2936;border-radius:6px}
+  .row{display:flex;gap:8px}
+  .half{flex:1}
+  .muted{color:#9aa6b2;font-size:13px}
+  .warn{color:#ff7b7b;font-weight:bold}
+  pre{background:#02101a;padding:8px;max-height:220px;overflow:auto;border-radius:6px}
+  button{cursor:pointer}
+</style>
+</head>
+<body>
+  <h2>Sol TWAP — v3</h2>
+  <div class="warn">Default network: Mainnet. Use Devnet for testing.</div>
+
+  <h3>Wallet (persistent)</h3>
+  <div class="row">
+    <button id="generateWallet">Generate Embedded Wallet</button>
+    <button id="importWallet">Import Wallet</button>
+    <button id="unlockWallet">Unlock</button>
+  </div>
+  <label>Passphrase (for encryption)</label>
+  <input id="pass" type="password" placeholder="Strong passphrase"/>
+  <div style="display:flex;gap:8px;margin-top:6px">
+    <button id="exportWallet">Export Wallet</button>
+    <button id="clearMemory">Clear In-Memory</button>
+  </div>
+  <div class="muted">Pubkey: <span id="pubkey">Not loaded</span></div>
+
+  <h3>Trade</h3>
+  <label>Mode</label>
+  <select id="buySell"><option value="buy">Buy (spend Quote → receive Base)</option><option value="sell">Sell (spend Base → receive Quote)</option></select>
+  <div class="row">
+    <div class="half">
+      <label>Base Token Mint (asset you want)</label>
+      <input id="baseMint" placeholder="e.g. So111111... or USDC mint"/>
+    </div>
+    <div class="half">
+      <label>Quote Token Mint (asset you spend)</label>
+      <input id="quoteMint" placeholder="e.g. So111111... or USDC mint"/>
+    </div>
+  </div>
+  <label>Amount (UI units)</label>
+  <input id="amount" value="0.1"/>
+  <label>Slippage %</label>
+  <input id="slippage" value="3"/>
+
+  <div style="display:flex;gap:8px;margin-top:8px">
+    <button id="getQuote" style="flex:1">Quote</button>
+    <button id="execute" style="flex:1">Execute</button>
+  </div>
+
+  <h3>TWAP</h3>
+  <label><input type="checkbox" id="twapToggle"/> Enable TWAP mode (register job)</label>
+  <label>Netlify URL</label>
+  <input id="netUrl" value="https://dashing-sunflower-94d6af.netlify.app/.netlify/functions"/>
+  <div class="row">
+    <input id="chunk" value="0.05"/>
+    <input id="interval" value="60000"/>
+  </div>
+  <div class="row" style="margin-top:8px">
+    <button id="register">Register TWAP</button>
+    <button id="cancel">Cancel</button>
+  </div>
+
+  <h3>Logs</h3>
+  <pre id="log"></pre>
+
+  <!-- Load Solana web3 + bs58 IIFE builds -->
+  <script src="https://unpkg.com/@solana/web3.js@1.95.3/dist/web3.min.js"></script>
+  <script src="https://unpkg.com/bs58@5.0.0/dist/bs58.min.js"></script>
+
+  <script src="popup.js"></script>
+</body>
+</html>

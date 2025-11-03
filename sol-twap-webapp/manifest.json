@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "Sol TWAP Toolkit \u2014 v3 (Chrome)",
+  "version": "3.0",
+  "description": "v3: persistent embedded wallet, solanaWeb3 import fixed, mainnet default, minimal UI.",
+  "permissions": [
+    "storage",
+    "alarms",
+    "scripting",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://quote-api.jup.ag/*",
+    "https://api.mainnet-beta.solana.com/*",
+    "https://dashing-sunflower-94d6af.netlify.app/*"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "48": "icons/icon48.png"
+  }
+}
