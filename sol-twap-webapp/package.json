@@ -1,0 +1,32 @@
+{
+  "name": "sol-twap-webapp",
+  "version": "3.0.0",
+  "description": "Solana TWAP Toolkit - A Chrome extension for time-weighted average price trading on Solana blockchain with persistent embedded wallet management",
+  "main": "background.js",
+  "scripts": {
+    "deploy": "firebase deploy",
+    "build": "echo 'No build step required for static extension'",
+    "lint": "echo 'Add linting configuration as needed'"
+  },
+  "keywords": [
+    "solana",
+    "twap",
+    "trading",
+    "blockchain",
+    "wallet",
+    "crypto",
+    "chrome-extension",
+    "jupiter"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/sol-twap-webapp.git"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
